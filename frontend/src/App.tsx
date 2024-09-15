@@ -1,35 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useRef, useState } from "react"
 
+const ENDPOINT = 'http://127.0.0.1:5000/parse-file'
+// const ENDPOINT = 'http://192.168.1.18:3002/parse-file'
 function App() {
-  const [count, setCount] = useState(0)
+    const inputRef = useRef<HTMLInputElement>(null)
+    const [outputText, setOutputText] = useState<string>("");
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+    async function sendFile() { 
+        let formData = new FormData()
+        if (inputRef.current && inputRef.current.files) {
+            const file = inputRef.current.files[0]
+            formData.append('file', file)
+            console.log('file: ', file)
+            
+            let response = await fetch(ENDPOINT, {
+              method: "POST",
+              body: formData,
+              // mode: 'no-cors',
+              headers: {
+                'Accept': 'application/json'
+              },
+              // credentials: 'include'
+            })
+            console.log('response: ', response)
+
+            const data = await response.json()
+            console.log('response data: ', data)  
+            const outputText = data.output;
+            setOutputText(outputText);
+
+
+        }
+    }
+
+    return (
+        <div>
+            <h1>Home</h1>
+            <div className="menu">
+                <input type='file' id='imageUpload' name='imageUpload' accept='*' ref={inputRef}/> 
+                <button type='submit' onClick={sendFile}> Submit </button>
+            </div>
+
+            <textarea value={outputText}>
+
+            </textarea>
+        </div>
+    )
 }
+
 
 export default App
