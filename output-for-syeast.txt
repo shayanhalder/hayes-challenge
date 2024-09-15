@@ -1,0 +1,8 @@
+Checksum on checksum.c:
+10474
+md5sum on input file:
+ad42a68243cb1414323a4d381426116a  syeast0.el
+Edges:
+8323 syeast0.el
+Nodes:
+1004
