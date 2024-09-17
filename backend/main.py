@@ -32,7 +32,6 @@ def parse_file():
     
     with tempfile.NamedTemporaryFile(mode='w+', delete=True) as temp_file:
         file.save(temp_file.name)
-        # bash_script = './backend.sh'
         
         try:
             result = subprocess.run([BASH_SCRIPT, temp_file.name], stdout=subprocess.PIPE, 
