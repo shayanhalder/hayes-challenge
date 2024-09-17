@@ -1,10 +1,15 @@
 from flask import Flask, jsonify, request
 import subprocess
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
+import os
+import tempfile
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 CORS(app, origins='*')
- 
+
+load_dotenv()
+BASH_SCRIPT = os.getenv('BASH_SCRIPT')
 
 @app.route('/')
 def home():
@@ -12,7 +17,8 @@ def home():
 
 @app.route('/parse-file', methods=['POST']) 
 def parse_file():
-    print('received request! ')
+    # input validation
+    
     if 'file' not in request.files:
         return jsonify({'error': 'No file given. '}), 400
 
@@ -21,22 +27,26 @@ def parse_file():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    input_file_path = 'input.txt'
-    file.save(input_file_path)
-    bash_script = './backend.sh'
-    try:
-        result = subprocess.run([bash_script, input_file_path], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        if result.returncode != 0:
-            return jsonify({'error': 'Script failed', 'output': result.stderr}), 500
+    # we need to save the in-memory file data to a temporary file to run the bash script on 
+    # we'll use tempfile module to do that 
+    
+    with tempfile.NamedTemporaryFile(mode='w+', delete=True) as temp_file:
+        file.save(temp_file.name)
+        # bash_script = './backend.sh'
+        
+        try:
+            result = subprocess.run([BASH_SCRIPT, temp_file.name], stdout=subprocess.PIPE, 
+                                    stderr=subprocess.STDOUT, text=True) # run the bash script with the input file
+            if result.returncode != 0:
+                return jsonify({'error': 'Script failed', 'output': result.stderr}), 500
 
-        return jsonify({'output': result.stdout})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+            return jsonify({'output': result.stdout})
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
 
 if __name__ == "__main__":
-    # app.run(debug=True, host="0.0.0.0", port='3002')
-    app.run(debug=True)#, host="0.0.0.0", port='3002')
+    app.run(debug=True) 
 
 
 
