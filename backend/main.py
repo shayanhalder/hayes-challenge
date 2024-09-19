@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 import subprocess
 from flask_cors import CORS
-import os
+import os 
 import tempfile
 from dotenv import load_dotenv
 
@@ -45,7 +45,7 @@ def parse_file():
 
 
 if __name__ == "__main__":
-    app.run(debug=True) 
+    app.run(debug=True, host='0.0.0.0') 
 
 
 

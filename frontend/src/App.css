@@ -56,8 +56,8 @@
 textarea {
   width: 20em;
   height: 30em;
-  max-width: 20em;
-  max-height: 30em;
+  max-width: 30em;
+  max-height: 40em;
 }
 
 .file-container { 
