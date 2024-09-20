@@ -18,7 +18,8 @@ function App() {
               method: "POST",
               body: formData, 
               headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
               }, 
             }); 
             const data = await response.json(); 
